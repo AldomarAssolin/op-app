@@ -1,8 +1,6 @@
+from src.app import create_app
 
+app = create_app()
 
-
-def main():
-    print("Iniciando a aplicação...")
-    
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)
