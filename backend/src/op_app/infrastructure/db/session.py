@@ -19,8 +19,13 @@ engine = create_engine(
 
 # Session factory
 SessionLocal = scoped_session(
-    sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    sessionmaker(
+        bind=engine,
+        autoflush=False,
+        autocommit=False,
+        expire_on_commit=False
     )
+)
 
 def get_session():
     """Retorna uma sessão (para uso em repositórios e UoW)."""
