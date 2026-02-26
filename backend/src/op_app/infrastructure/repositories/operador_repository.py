@@ -8,6 +8,8 @@ class OperadorRepository:
 
     def add(self, operador: OperadorModel) -> OperadorModel:
         self.session.add(operador)
+        self.session.flush()
+        self.session.refresh(operador)
         return operador
 
     def get_by_id(self, operador_id: int) -> OperadorModel | None:
@@ -16,17 +18,25 @@ class OperadorRepository:
     def list_all(self) -> list[OperadorModel]:
         return self.session.query(OperadorModel).order_by(OperadorModel.id.asc()).all()
     
-    def update(self, operador_id: int, operador: OperadorModel) -> OperadorModel | None:
+    def update(self, operador_id: int, data: dict) -> OperadorModel | None:
         existing = self.session.get(OperadorModel, operador_id)
         if not existing:
             return None
 
-        for attr, value in vars(operador).items():
-            if attr != "id" and hasattr(existing, attr):
-                setattr(existing, attr, value)
+        for field in ("nome", "funcao", "setor"):
+            if field in data:
+                setattr(existing, field, data[field])
 
-        # SEM commit aqui
         return existing
+    
+    def delete_by_id(self, operador_id: int) -> bool:
+        existing = self.session.get(OperadorModel, operador_id)
+        
+        if not existing:
+            return False
+        
+        self.session.delete(existing)
+        return True
 
     
     # def list(self,setor: str | None = None,funcao: str | None = None,nome: str | None = None) -> list[OperadorModel]:

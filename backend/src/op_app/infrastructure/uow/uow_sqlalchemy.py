@@ -19,5 +19,5 @@ class UnitOfWorkSQLAlchemy:
             else:
                 self.session.commit()
         finally:
-            # em scoped_session, isso é o encerramento “correto”
+            self.session.close()
             remove_session()
