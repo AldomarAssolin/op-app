@@ -16,12 +16,25 @@ class OperadorRepository:
     def list_all(self) -> list[OperadorModel]:
         return self.session.query(OperadorModel).order_by(OperadorModel.id.asc()).all()
     
-    def list(self,setor: str | None = None,funcao: str | None = None,nome: str | None = None) -> list[OperadorModel]:
-        q = self.session.query(OperadorModel)
-        if setor:
-            q = q.filter(OperadorModel.setor == setor)
-        if funcao:
-            q = q.filter(OperadorModel.funcao == funcao)
-        if nome:
-            q = q.filter(OperadorModel.nome.ilike(f"%{nome}%"))
-        return q.order_by(OperadorModel.id.asc()).all()
+    def update(self, operador_id: int, operador: OperadorModel) -> OperadorModel | None:
+        existing = self.session.get(OperadorModel, operador_id)
+        if not existing:
+            return None
+
+        for attr, value in vars(operador).items():
+            if attr != "id" and hasattr(existing, attr):
+                setattr(existing, attr, value)
+
+        # SEM commit aqui
+        return existing
+
+    
+    # def list(self,setor: str | None = None,funcao: str | None = None,nome: str | None = None) -> list[OperadorModel]:
+    #     q = self.session.query(OperadorModel)
+    #     if setor:
+    #         q = q.filter(OperadorModel.setor == setor)
+    #     if funcao:
+    #         q = q.filter(OperadorModel.funcao == funcao)
+    #     if nome:
+    #         q = q.filter(OperadorModel.nome.ilike(f"%{nome}%"))
+    #     return q.order_by(OperadorModel.id.asc()).all()
