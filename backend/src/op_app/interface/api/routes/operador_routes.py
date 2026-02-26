@@ -34,3 +34,14 @@ def criar_operador():
         "funcao": operador.funcao,
         "setor": operador.setor
     }), 201
+    
+@bp_operadores.get("")
+def listar_operadores():
+    with UnitOfWorkSQLAlchemy() as uow:
+        operadores = uow.operadores.list_all()
+
+    return jsonify([
+        {"id": o.id, "nome": o.nome, "funcao": o.funcao, "setor": o.setor}
+        for o in operadores
+    ]), 200
+    
