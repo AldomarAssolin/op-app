@@ -13,8 +13,9 @@ bp_operadores = Blueprint("operadores", __name__, url_prefix="/operadores")
 def criar_operador():
     payload = request.get_json(silent=True) or {}
     try:
+        inp = CriarOperadorInput(**payload)
         with UnitOfWorkSQLAlchemy() as uow:
-            result = ListarOperadorUC().execute(uow)
+            result = CriarOperadorUC().execute(uow, inp)
 
         return jsonify(result), 200
 
