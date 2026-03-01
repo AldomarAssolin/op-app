@@ -16,8 +16,13 @@ class UnitOfWorkSQLAlchemy:
         try:
             if exc_type:
                 self.session.rollback()
-            else:
+                return False  # re-raise a exceção original
+
+            try:
                 self.session.commit()
+            except Exception:
+                self.session.rollback()
+                raise
+
         finally:
             self.session.close()
-            remove_session()

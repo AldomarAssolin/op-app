@@ -6,21 +6,34 @@ from src.op_app.application.use_cases.operador.listar_operador_uc import ListarO
 from src.op_app.application.use_cases.operador.buscar_operador_por_id_uc import BuscarOperadorPorIdUC
 from src.op_app.application.use_cases.operador.atualizar_operador_parcial_uc import AtualizarOperadorParcialUC
 from src.op_app.application.use_cases.operador.deletar_operador_uc import DeletarOperadorUC
+from src.op_app.application.errors import NotFoundError
+from src.op_app.application.errors import ValidationError
 
 bp_operadores = Blueprint("operadores", __name__, url_prefix="/operadores")
 
 @bp_operadores.post("")
 def criar_operador():
-    payload = request.get_json(silent=True) or {}
+    payload = request.get_json(silent=True)
+
+    if payload is None:
+        raise ValidationError(
+            "JSON inválido ou ausente",
+            details={"hint": "Envie Content-Type: application/json e um body JSON válido"}
+        )
+
     try:
         inp = CriarOperadorInput(**payload)
-        with UnitOfWorkSQLAlchemy() as uow:
-            result = CriarOperadorUC().execute(uow, inp)
+    except TypeError as e:
+        # faltou campo obrigatório ou veio chave errada
+        raise ValidationError(
+            "Payload inválido",
+            details={"hint": "Campos obrigatórios: nome, funcao, setor", "raw_error": str(e)}
+        )
 
-        return jsonify(result), 200
+    with UnitOfWorkSQLAlchemy() as uow:
+        result = CriarOperadorUC().execute(uow, inp)
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    return jsonify(result), 201
     
 @bp_operadores.get("")
 def listar_operadores():
@@ -34,7 +47,7 @@ def buscar_operador_por_id(operador_id: int):
         result = BuscarOperadorPorIdUC().execute(uow, operador_id)
 
     if not result:
-        return jsonify({"error": "Operador não encontrado"}), 404
+        return NotFoundError("OPerador não encontrado", details={"operador_id": operador_id})
 
     return jsonify(result), 200
 
@@ -66,8 +79,3 @@ def deletar_operador(operador_id: int):
         return jsonify({"error": "Operador não encontrado"}), 404
 
     return ("", 204)
-
-    
-    
-
-    

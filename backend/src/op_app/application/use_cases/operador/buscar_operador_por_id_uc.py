@@ -1,5 +1,7 @@
 from typing import Dict, Any
 
+from src.op_app.application.errors import ValidationError
+
 
 class BuscarOperadorPorIdUC:
     def execute(self, uow, operador_id: int) -> Dict[str, Any] | None:

@@ -9,7 +9,6 @@ class OperadorRepository:
     def add(self, operador: OperadorModel) -> OperadorModel:
         self.session.add(operador)
         self.session.flush()
-        self.session.refresh(operador)
         return operador
 
     def get_by_id(self, operador_id: int) -> OperadorModel | None:

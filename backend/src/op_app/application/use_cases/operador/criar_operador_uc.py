@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from src.op_app.infrastructure.db.models.operador_model import OperadorModel
 
+from src.op_app.application.errors import ValidationError
+
 @dataclass(frozen=True)
 class CriarOperadorInput:
     nome:str
@@ -15,7 +17,10 @@ class CriarOperadorUC:
         setor = (data.setor or "").strip()
         
         if not nome or not funcao or not setor:
-            raise ValueError("Campos obrigatorios: nome, funcao, setor")
+            raise ValueError(
+                "Campos obrigatorios: nome, funcao, setor",
+                datails={"fields": ["nome", "funcao", "setor"]}
+                )
         
         operador = OperadorModel(nome=nome, funcao=funcao, setor=setor)
         uow.operadores.add(operador)

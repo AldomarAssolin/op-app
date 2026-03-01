@@ -1,5 +1,7 @@
 from typing import Dict, Any
 
+from src.op_app.application.errors import ValidationError
+
 
 class AtualizarOperadorParcialUC:
     def execute(self, uow, operador_id: int, data: Dict[str, Any]) -> Dict[str, Any] | None:
@@ -13,7 +15,7 @@ class AtualizarOperadorParcialUC:
             if campo in data:
                 valor = (data[campo] or "").strip()
                 if not valor:
-                    raise ValueError(f"Campo '{campo}' não pode ser vazio")
+                    raise ValueError(f"Campo '{campo}' não pode ser vazio", details={"Field": campo})
                 setattr(operador, campo, valor)
 
         return {
