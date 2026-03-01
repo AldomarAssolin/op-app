@@ -1,6 +1,8 @@
 from flask import jsonify
 from src.op_app.application.errors import AppError
 
+import traceback
+
 def register_error_handlers(app):
     @app.errorhandler(AppError)
     def handle_app_error(err: AppError):
@@ -14,6 +16,7 @@ def register_error_handlers(app):
 
     @app.errorhandler(Exception)
     def handle_unexpected_error(err: Exception):
+        traceback.print_exc()
         # em produção, não vaza stacktrace pro cliente
         return jsonify({
             "error": {

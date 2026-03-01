@@ -30,7 +30,7 @@ def criar_operador():
         raise ValidationError(
             "Payload inválido",
             details={
-                "hint": "Campos obrigatórios: nome, funcao, setor",
+                "hint": "Campos obrigatórios: nome, funcao, setor_id",
                 "raw_error": str(e),
             },
         )
