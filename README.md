@@ -25,42 +25,48 @@ O sistema permite:
 * Controlar status por item
 * Registrar inspeções
 * Organizar fila por prioridade
+* Gerenciar operadores e setores
 
 ---
 
-## 🏗 Arquitetura
+# 🏗 Arquitetura
 
-O projeto segue uma abordagem inspirada em:
+O projeto segue abordagem inspirada em:
 
 * Clean Architecture
 * Domain-Driven Design (DDD)
 * Arquitetura em Camadas
 
-### Camadas
+## Camadas
 
-| Camada             | Responsabilidade                   |
-| ------------------ | ---------------------------------- |
-| **Interface**      | API HTTP (Flask + Schemas + Rotas) |
-| **Application**    | Casos de uso e orquestração        |
-| **Domain**         | Regras de negócio puras            |
-| **Infrastructure** | Banco de dados, CSV, repositórios  |
-| **Shared**         | Utilitários transversais           |
+| Camada             | Responsabilidade                    |
+| ------------------ | ----------------------------------- |
+| **Interface**      | API HTTP (Flask + Rotas + Handlers) |
+| **Application**    | Casos de uso e orquestração         |
+| **Domain**         | Regras de negócio puras             |
+| **Infrastructure** | Banco de dados, CSV, repositórios   |
+| **Shared**         | Utilitários transversais            |
 
 Separação pensada para:
 
 * Facilitar testes
 * Evitar acoplamento com Flask
-* Permitir troca de banco ou interface no futuro
+* Permitir troca de banco no futuro
+* Permitir troca da interface (API → CLI → Web)
 
 ---
 
-## 📂 Estrutura do Projeto
+# 📂 Estrutura do Projeto
 
 ```
 op-app/
 └── backend/
     ├── run.py
+    ├── run_dev.sh
     ├── wsgi.py
+    ├── .env
+    ├── .env.example
+    ├── requirements.txt
     ├── src/
     │   ├── interface/
     │   ├── application/
@@ -71,60 +77,9 @@ op-app/
     └── tests/
 ```
 
-### 🔹 domain/
-
-Contém regras puras de negócio:
-
-* Entidades (OP, Item, Etapa, Operador…)
-* Value Objects (Status, Prioridade, Prazo)
-* Policies (transições de status)
-* Exceções de regra
-
-Nenhuma dependência de Flask ou SQLAlchemy.
-
 ---
 
-### 🔹 application/
-
-Casos de uso do sistema:
-
-* `importar_csv_uc.py`
-* `criar_op_uc.py`
-* `iniciar_item_uc.py`
-* `finalizar_item_uc.py`
-* `registrar_inspecao_uc.py`
-
-Orquestra entidades + repositórios via Unit of Work.
-
----
-
-### 🔹 infrastructure/
-
-Implementações concretas:
-
-* SQLAlchemy Models
-* Repositórios
-* Unit of Work
-* Leitura de CSV
-* Validações
-* Mapeadores
-
-Aqui vivem os detalhes técnicos.
-
----
-
-### 🔹 interface/
-
-Camada HTTP:
-
-* Rotas
-* Schemas (Marshmallow / Smorest)
-* Handlers de erro
-* Health check
-
----
-
-## 🔄 Fluxo Principal do Sistema
+# 🔄 Fluxo Principal do Sistema
 
 1. PCP envia planilha CSV
 2. Sistema importa e valida
@@ -136,53 +91,111 @@ Camada HTTP:
 
 ---
 
-## 🚀 Como Rodar o Projeto (Dev)
+# 🚀 Como Rodar o Projeto (Desenvolvimento)
 
-### 1️⃣ Criar ambiente virtual
+## 1️⃣ Criar ambiente virtual
+
+Na pasta `backend/`:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Linux
+source .venv/bin/activate      # Linux / WSL
 # ou
-.venv\Scripts\activate      # Windows
+.venv\Scripts\activate         # Windows
 ```
 
-### 2️⃣ Instalar dependências
+---
+
+## 2️⃣ Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Configurar variáveis
+---
+
+## 3️⃣ Configurar variáveis de ambiente
 
 Copie:
 
 ```
-.env.example -> .env
+.env.example → .env
 ```
 
-Configure:
+Exemplo de `.env`:
 
 ```
-DATABASE_URL=
-SECRET_KEY=
-```
-
-### 4️⃣ Rodar aplicação
-
-```bash
-flask --app run run
-```
-
-Ou:
-
-```bash
-python run.py
+DATABASE_URL=sqlite:///op_app.db
+SECRET_KEY=dev-secret-key
+APP_PORT=8010
 ```
 
 ---
 
-## 🧪 Testes
+## 4️⃣ Aplicar migrations
+
+Se for primeira vez:
+
+```bash
+alembic upgrade head
+```
+
+Se alterou models:
+
+```bash
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
+
+⚠️ Em ambiente dev, se o banco ficou inconsistente:
+
+```bash
+rm op_app.db
+alembic upgrade head
+```
+
+---
+
+## 5️⃣ Rodar aplicação (modo desenvolvimento)
+
+Agora usamos o script:
+
+```bash
+./run_dev.sh
+```
+
+O app será iniciado via Gunicorn com:
+
+* Reload automático
+* Logs habilitados
+* Porta definida via `.env`
+
+Por padrão:
+
+```
+http://127.0.0.1:8010
+```
+
+---
+
+# 🏭 Rodando em Produção
+
+Em produção utilize:
+
+```bash
+gunicorn wsgi:app --workers 2 --bind 0.0.0.0:8010
+```
+
+⚠️ Em produção real:
+
+* Use Postgres
+* Configure variáveis via ambiente do servidor
+* Desative reload
+* Configure logs estruturados
+
+---
+
+# 🧪 Testes
 
 Rodar todos os testes:
 
@@ -198,42 +211,46 @@ tests/
 └── integration/
 ```
 
-* Unit: domínio e validações
-* Integration: endpoints e casos de uso
+* Unit → domínio e regras puras
+* Integration → endpoints e casos de uso
 
 ---
 
-## 🛠 Tecnologias
+# 🛠 Tecnologias
 
 * Python 3.12+
 * Flask
-* Flask-Smorest
-* SQLAlchemy
-* Alembic / Flask-Migrate
+* SQLAlchemy 2.0
+* Alembic
 * Pytest
+* Gunicorn
 
 ---
 
-## 📌 Decisões Arquiteturais
+# 📌 Decisões Arquiteturais
 
 * Uso de **Unit of Work** para controle transacional
 * Domínio isolado de infraestrutura
-* Regras de transição de status centralizadas
-* DTOs para desacoplamento entre camadas
+* Erros padronizados (`ValidationError`, `NotFoundError`, etc.)
+* Operador referencia `setor_id` (FK real)
+* Banco desacoplado da regra de negócio
 
 ---
 
-## 📈 Evolução Planejada
+# 📈 Evolução Planejada
 
-* Autenticação de usuários
+* Autenticação JWT
 * Controle por operador
 * Dashboard de produção
 * Métricas de eficiência
-* API para frontend mobile
+* API para frontend
+* Migração para Postgres
+* Logs estruturados
+* Observabilidade
 
 ---
 
-## 👨‍🏭 Contexto Real
+# 👨‍🏭 Contexto Real
 
 Projeto inspirado em ambiente de metalúrgica:
 
@@ -242,5 +259,5 @@ Projeto inspirado em ambiente de metalúrgica:
 * Inspeção
 * Liberação
 
->Foco em simplicidade inicial com arquitetura escalável.
+Foco em simplicidade inicial com arquitetura escalável.
 
