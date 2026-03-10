@@ -26,3 +26,7 @@ class NotFoundError(AppError):
 class ConflictError(AppError):
     code = "CONFLICT"
     status_code = 409
+    
+class IntegrityError(AppError):
+    code = "INTEGRITY_ERROR"
+    status_code = 400

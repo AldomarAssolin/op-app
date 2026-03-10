@@ -1,24 +1,24 @@
 from sqlalchemy.orm import Session
-from ..db.models.operador_model import OperadorModel
+from src.op_app.infrastructure.db.models.usuario_model import UsuarioModel
 
 
-class OperadorRepository:
+class UsuarioRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def add(self, operador: OperadorModel) -> OperadorModel:
-        self.session.add(operador)
+    def add(self, usuario: UsuarioModel) -> UsuarioModel:
+        self.session.add(usuario)
         self.session.flush()
-        return operador
+        return usuario
 
-    def get_by_id(self, operador_id: int) -> OperadorModel | None:
-        return self.session.get(OperadorModel, operador_id)
+    def get_by_id(self, usuario_id: int) -> UsuarioModel | None:
+        return self.session.get(UsuarioModel, usuario_id)
 
-    def list_all(self) -> list[OperadorModel]:
-        return self.session.query(OperadorModel).order_by(OperadorModel.id.asc()).all()
+    def list_all(self) -> list[UsuarioModel]:
+        return self.session.query(UsuarioModel).order_by(UsuarioModel.id.asc()).all()
     
-    def update(self, operador_id: int, data: dict) -> OperadorModel | None:
-        existing = self.session.get(OperadorModel, operador_id)
+    def update(self, usuario_id: int, data: dict) -> UsuarioModel | None:
+        existing = self.session.get(UsuarioModel, usuario_id)
         if not existing:
             return None
 
@@ -28,8 +28,8 @@ class OperadorRepository:
 
         return existing
     
-    def delete_by_id(self, operador_id: int) -> bool:
-        existing = self.session.get(OperadorModel, operador_id)
+    def delete_by_id(self, usuario_id: int) -> bool:
+        existing = self.session.get(UsuarioModel, usuario_id)
         
         if not existing:
             return False

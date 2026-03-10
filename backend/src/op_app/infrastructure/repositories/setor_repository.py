@@ -25,7 +25,7 @@ class SetorRepository:
         if not existing:
             return None
 
-        for field in ("nome", "descricao"):
+        for field in ("nome", "descricao", "ativo"):
             if field in data:
                 setattr(existing, field, data[field])
 
