@@ -5,4 +5,4 @@ class ListarSetoresUC:
         if not setores:
             return []
         
-        return [{"id": s.id, "nome": s.nome, "descricao": s.descricao, "ativo": s.ativo} for s in setores]
+        return [{"id": s.id, "nome": s.nome, "codigo_setor": s.codigo_setor, "ativo": s.ativo} for s in setores]

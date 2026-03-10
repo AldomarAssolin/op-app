@@ -7,24 +7,26 @@ class AtualizarSetorParcialUC:
         if not setor:
             raise NotFoundError("Setor não encontrado", details={"setor_id": setor_id})
 
-        if "nome" in payload or "descricao" in payload:
+        if "nome" in payload or "codigo_setor" in payload:
             nome = (payload.get("nome") or "").strip()
-            descricao = (payload.get("descricao") or "").strip() or None
-            
-            if not nome:
-                raise ValidationError("nome não pode ser vazio", details={"field": "nome"})
+            codigo_setor = (payload.get("codigo_setor") or "").strip() or None
 
             existente = uow.setores.get_by_nome(nome)
             if existente and existente.id != setor_id:
                 raise ConflictError("Já existe um setor com esse nome", details={"nome": nome})
 
             setor.nome = nome
-            setor.descricao = descricao
+            setor.codigo_setor = codigo_setor
 
         if "ativo" in payload:
             ativo = payload.get("ativo")
             if not isinstance(ativo, bool):
                 raise ValidationError("ativo deve ser boolean", details={"field": "ativo"})
             setor.ativo = ativo
+            
+        if not setor.nome:
+            setor.nome = setor.nome.strip()
+            
+        
 
-        return {"id": setor.id, "nome": setor.nome, "descricao": setor.descricao, "ativo": setor.ativo}
+        return {"id": setor.id, "nome": setor.nome, "codigo_setor": setor.codigo_setor, "ativo": setor.ativo}

@@ -5,4 +5,4 @@ class BuscarSetorPorIdUC:
         setor = uow.setores.get_by_id(setor_id)
         if not setor:
             raise NotFoundError("Setor não encontrado", details={"setor_id": setor_id})
-        return {"id": setor.id, "nome": setor.nome, "descricao": setor.descricao, "ativo": setor.ativo}
+        return {"id": setor.id, "nome": setor.nome, "codigo_setor": setor.codigo_setor, "ativo": setor.ativo}

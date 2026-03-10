@@ -7,19 +7,19 @@ from src.op_app.application.errors import ValidationError, ConflictError, Integr
 @dataclass(frozen=True)
 class CriarSetorInput:
     nome: str
-    descricao: str | None = None
+    codigo_setor: str | None = None
     ativo: bool = True
 
 class CriarSetorUC:
     def execute(self, uow, data: CriarSetorInput) -> dict:
         nome = (data.nome or "").strip()
-        descricao = (data.descricao or "").strip() or None
+        codigo_setor = (data.codigo_setor or "").strip() or None
         ativo = True
 
         if not nome:
             raise ValidationError(
                 "Campo obrigatório: nome",
-                details={"fields": ["nome", "descricao", "ativo"]}
+                details={"fields": ["nome", "codigo_setor", "ativo"]}
             )
 
         if uow.setores.get_by_nome(nome):
@@ -28,7 +28,7 @@ class CriarSetorUC:
                 details={"field": "nome", "value": nome}
             )
 
-        setor = SetorModel(nome=nome, descricao=descricao, ativo=ativo)
+        setor = SetorModel(nome=nome, codigo_setor=codigo_setor, ativo=ativo)
         
         try:
             uow.setores.add(setor)  # repo faz flush -> pega id
@@ -40,6 +40,6 @@ class CriarSetorUC:
         return {
             "id": setor.id,
             "nome_setor": setor.nome,
-            "descricao": setor.descricao,
+            "codigo_setor": setor.codigo_setor,
             "ativo": setor.ativo
         }

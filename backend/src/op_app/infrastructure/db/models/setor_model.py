@@ -9,7 +9,7 @@ class SetorModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
-    descricao: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    codigo_setor: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     ativo: Mapped[bool] = mapped_column(nullable=False, default=True)
 
     usuarios = relationship("UsuarioModel", back_populates="setor")
