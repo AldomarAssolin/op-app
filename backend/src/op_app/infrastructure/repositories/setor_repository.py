@@ -41,3 +41,6 @@ class SetorRepository:
         
         self.session.delete(existing)
         return True
+    
+    def list_all(self) -> list[SetorModel]:
+        return self.session.query(SetorModel).order_by(SetorModel.nome.asc()).all()

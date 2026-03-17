@@ -20,7 +20,7 @@ def init_session(database_url: str | None = None):
     # Melhor ainda: carregar .env no entrypoint (run.py/wsgi.py)
     load_dotenv()
 
-    db_url = database_url or os.getenv("DATABASE_URL", "sqlite:///op_app.db")
+    db_url = database_url or os.getenv("DATABASE_URL")
 
     engine = create_engine(
         db_url,

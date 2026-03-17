@@ -6,6 +6,6 @@ class FuncaoModel(Base):
     __tablename__ = "funcoes"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    nome_funcao: Mapped[str] = mapped_column(String(50), nullable=False)
+    nome_funcao: Mapped[str] = mapped_column("nome", String(50), nullable=False, unique=True)
 
     usuarios = relationship("UsuarioModel", back_populates="funcao")

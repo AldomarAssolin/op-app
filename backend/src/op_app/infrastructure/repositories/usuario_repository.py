@@ -37,6 +37,9 @@ class UsuarioRepository:
         
         self.session.delete(existing)
         return True
+    
+    def list_all(self) -> list[UsuarioModel]:
+        return self.session.query(UsuarioModel).order_by(UsuarioModel.nome.asc()).all()
 
     
     # def list(self,setor: str | None = None,funcao: str | None = None,nome: str | None = None) -> list[OperadorModel]:

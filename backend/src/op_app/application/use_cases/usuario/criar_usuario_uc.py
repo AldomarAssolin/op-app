@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from werkzeug.security import generate_password_hash
 
 from src.op_app.domain.dto.UsuarioDTO import UsuarioDTO as Usuario
 from src.op_app.interface.api.schemas.usuario_dto import UsuarioDTO
@@ -10,7 +11,7 @@ from src.op_app.application.errors import ValidationError, NotFoundError
 class CriarUsuarioInput:
     """Input para criação de usuário."""
     nome: str
-    pin: str
+    pin_hash: str
     funcao_id: int
     setor_id: int
 
@@ -22,7 +23,7 @@ class CriarUsuarioUC:
         """Executa a criação do usuário com validações de negócio."""
         # Validações básicas e sanitização
         nome = (data.nome or "").strip()
-        pin = (data.pin or "").strip()
+        pin = (data.pin_hash or "").strip()
         funcao_id = data.funcao_id
         setor_id = data.setor_id
 
@@ -62,7 +63,7 @@ class CriarUsuarioUC:
             usuario_entity = Usuario(
                 id=None,  # Será gerado pelo banco
                 nome=nome,
-                pin=pin,
+                pin_hash=pin,
                 funcao_id=funcao_id,
                 setor_id=setor_id,
             )
@@ -72,7 +73,7 @@ class CriarUsuarioUC:
         # Mapear para modelo e adicionar via repositório
         usuario_model = UsuarioModel(
             nome=usuario_entity.nome,
-            pin=usuario_entity.pin,
+            pin_hash=generate_password_hash(usuario_entity.pin_hash),
             funcao_id=usuario_entity.funcao_id,
             setor_id=usuario_entity.setor_id,
         )
@@ -82,7 +83,7 @@ class CriarUsuarioUC:
         return UsuarioDTO(
             id=usuario_adicionado.id,
             nome=usuario_adicionado.nome,
-            pin=usuario_adicionado.pin,
+            pin_hash=usuario_adicionado.pin_hash,
             funcao_id=usuario_adicionado.funcao_id,
             setor_id=usuario_adicionado.setor_id,
         )
