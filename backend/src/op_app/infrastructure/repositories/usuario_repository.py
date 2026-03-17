@@ -14,8 +14,9 @@ class UsuarioRepository:
     def get_by_id(self, usuario_id: int) -> UsuarioModel | None:
         return self.session.get(UsuarioModel, usuario_id)
 
-    def list_all(self) -> list[UsuarioModel]:
-        return self.session.query(UsuarioModel).order_by(UsuarioModel.id.asc()).all()
+    def get_by_nome(self, nome: str) -> UsuarioModel | None:
+        """Busca usuário por nome."""
+        return self.session.query(UsuarioModel).filter(UsuarioModel.nome == nome).first()
     
     def update(self, usuario_id: int, data: dict) -> UsuarioModel | None:
         existing = self.session.get(UsuarioModel, usuario_id)

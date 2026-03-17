@@ -17,7 +17,9 @@ class SetorRepository:
     def get_by_nome(self, nome: str) -> SetorModel | None:
         return self.session.query(SetorModel).filter(SetorModel.nome == nome).first()
 
-    def list_all(self) -> list[SetorModel]:
+    def get_by_codigo(self, codigo_setor: str) -> SetorModel | None:
+        """Busca setor por código."""
+        return self.session.query(SetorModel).filter(SetorModel.codigo_setor == codigo_setor).first()
         return self.session.query(SetorModel).order_by(SetorModel.nome.asc()).all()
     
     def update(self, setor_id: int, data: dict) -> SetorModel | None:

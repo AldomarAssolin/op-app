@@ -1,10 +1,11 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from src.op_app.application.errors import ValidationError
+from src.op_app.interface.api.schemas.usuario_dto import UsuarioDTO
 
 
 class AtualizarUsuarioParcialUC:
-    def execute(self, uow, usuario_id: int, data: Dict[str, Any]) -> Dict[str, Any] | None:
+    def execute(self, uow, usuario_id: int, data: Dict[str, Any]) -> Optional[UsuarioDTO]:
         usuario = uow.usuarios.get_by_id(usuario_id)
 
         if not usuario:
@@ -15,12 +16,16 @@ class AtualizarUsuarioParcialUC:
             if campo in data:
                 valor = (data[campo] or "")
                 if not valor:
-                    raise ValueError(f"Campo '{campo}' não pode ser vazio", details={"Field": campo})
+                    raise ValidationError(
+                        f"Campo '{campo}' não pode ser vazio",
+                        details={"field": campo},
+                    )
                 setattr(usuario, campo, valor)
 
-        return {
-            "id": usuario.id,
-            "nome": usuario.nome.strip(),
-            "funcao_id": usuario.funcao_id,
-            "setor_id": usuario.setor_id,
-        }
+        return UsuarioDTO(
+            id=usuario.id,
+            nome=usuario.nome.strip(),
+            pin=usuario.pin,
+            funcao_id=usuario.funcao_id,
+            setor_id=usuario.setor_id,
+        )

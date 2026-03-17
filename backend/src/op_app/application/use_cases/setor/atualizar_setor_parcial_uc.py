@@ -1,7 +1,8 @@
 from src.op_app.application.errors import ValidationError, NotFoundError, ConflictError
+from src.op_app.interface.api.schemas.setor_dto import SetorDTO
 
 class AtualizarSetorParcialUC:
-    def execute(self, uow, setor_id: int, payload: dict) -> dict:
+    def execute(self, uow, setor_id: int, payload: dict) -> SetorDTO:
         setor = uow.setores.get_by_id(setor_id)
 
         if not setor:
@@ -28,5 +29,9 @@ class AtualizarSetorParcialUC:
             setor.nome = setor.nome.strip()
             
         
-
-        return {"id": setor.id, "nome": setor.nome, "codigo_setor": setor.codigo_setor, "ativo": setor.ativo}
+        return SetorDTO(
+            id=setor.id,
+            nome=setor.nome,
+            codigo_setor=setor.codigo_setor,
+            ativo=setor.ativo
+        )
