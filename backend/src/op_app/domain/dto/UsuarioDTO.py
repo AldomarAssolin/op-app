@@ -15,7 +15,7 @@ class UsuarioDTO:
         """Validações básicas da entidade."""
         if not self.nome or len(self.nome.strip()) == 0:
             raise ValueError("Nome é obrigatório")
-        if not self.pin or len(self.pin_hash) < 4:
+        if not self.pin_hash or len(self.pin_hash) < 4:
             raise ValueError("PIN deve ter pelo menos 4 caracteres")
         if self.funcao_id <= 0:
             raise ValueError("funcao_id deve ser um inteiro positivo")

@@ -7,6 +7,6 @@ class UsuarioDTO:
     """DTO para retorno de dados de Usuario."""
     id: int
     nome: str
-    pin: str
+    pin_hash: str
     funcao_id: int
     setor_id: int

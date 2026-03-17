@@ -14,7 +14,7 @@ class BuscarUsuarioPorIdUC:
         return UsuarioDTO(
             id=usuarios.id,
             nome=usuarios.nome,
-            pin=usuarios.pin,
+            pin_hash=usuarios.pin_hash,
             funcao_id=usuarios.funcao_id,
             setor_id=usuarios.setor_id,
         )

@@ -11,7 +11,7 @@ class ListarUsuarioUC:
             UsuarioDTO(
                 id=u.id,
                 nome=u.nome,
-                pin=u.pin,
+                pin_hash=u.pin_hash,
                 funcao_id=u.funcao_id,
                 setor_id=u.setor_id,
             )

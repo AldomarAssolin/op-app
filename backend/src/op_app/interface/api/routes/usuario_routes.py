@@ -30,7 +30,7 @@ def criar_usuario():
         raise ValidationError(
             "Payload inválido",
             details={
-                "hint": "Campos obrigatórios: nome, funcao, setor_id",
+                "hint": "Campos obrigatórios: nome, pin_hash, funcao, setor_id",
                 "raw_error": str(e),
             },
         )

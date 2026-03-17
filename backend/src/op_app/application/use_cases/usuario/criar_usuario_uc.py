@@ -23,21 +23,21 @@ class CriarUsuarioUC:
         """Executa a criação do usuário com validações de negócio."""
         # Validações básicas e sanitização
         nome = (data.nome or "").strip()
-        pin = (data.pin_hash or "").strip()
+        pin_hash = (data.pin_hash or "").strip()
         funcao_id = data.funcao_id
         setor_id = data.setor_id
 
         # Validações de campos obrigatórios
-        if not nome or not pin:
+        if not nome or not pin_hash:
             raise ValidationError(
-                "Campos obrigatórios: nome, pin",
-                details={"fields": ["nome", "pin"]},
+                "Campos obrigatórios: nome, pin_hash",
+                details={"fields": ["nome", "pin_hash"]},
             )
 
         # Validações de negócio adicionais
-        if len(pin) < 4:
+        if len(pin_hash) < 4:
             raise ValidationError(
-                "PIN deve ter pelo menos 4 caracteres",
+                "Pin deve ter pelo menos 4 caracteres",
                 details={"field": "pin", "hint": "Use pelo menos 4 dígitos"},
             )
 
@@ -63,7 +63,7 @@ class CriarUsuarioUC:
             usuario_entity = Usuario(
                 id=None,  # Será gerado pelo banco
                 nome=nome,
-                pin_hash=pin,
+                pin_hash=pin_hash,
                 funcao_id=funcao_id,
                 setor_id=setor_id,
             )

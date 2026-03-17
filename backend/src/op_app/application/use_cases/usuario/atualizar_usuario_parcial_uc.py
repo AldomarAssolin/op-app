@@ -12,7 +12,7 @@ class AtualizarUsuarioParcialUC:
             return None
 
         # Atualiza somente campos enviados
-        for campo in ("nome", "funcao_id", "setor_id"):
+        for campo in ("nome", "pin_hash", "funcao_id", "setor_id"):
             if campo in data:
                 valor = (data[campo] or "")
                 if not valor:
@@ -25,7 +25,7 @@ class AtualizarUsuarioParcialUC:
         return UsuarioDTO(
             id=usuario.id,
             nome=usuario.nome.strip(),
-            pin=usuario.pin,
+            pin_hash=usuario.pin_hash,
             funcao_id=usuario.funcao_id,
             setor_id=usuario.setor_id,
         )

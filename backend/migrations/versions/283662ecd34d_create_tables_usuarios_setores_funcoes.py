@@ -1,8 +1,8 @@
-"""Create usuarios, funcoes e setores tables
+"""Create Tables Usuarios Setores Funcoes
 
-Revision ID: c3e37ba250dd
+Revision ID: 283662ecd34d
 Revises: 
-Create Date: 2026-03-17 11:33:51.933607
+Create Date: 2026-03-17 12:07:43.401700
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c3e37ba250dd'
+revision: str = '283662ecd34d'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
