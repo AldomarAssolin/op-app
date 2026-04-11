@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from werkzeug.security import generate_password_hash
 
 from src.op_app.domain.dto.UsuarioDTO import UsuarioDTO as Usuario
@@ -12,8 +13,8 @@ class CriarUsuarioInput:
     """Input para criação de usuário."""
     nome: str
     pin_hash: str
-    funcao_id: int
-    setor_id: int
+    funcao_id: Optional[int] = None
+    setor_id: Optional[int] = None
 
 
 class CriarUsuarioUC:
@@ -50,13 +51,17 @@ class CriarUsuarioUC:
             )
 
         # Verificar existência de setor e função
-        setor = uow.setores.get_by_id(setor_id)
-        if not setor:
-            raise NotFoundError("Setor não encontrado", details={"setor_id": setor_id})
+        setor = None
+        if setor_id is not None:
+            setor = uow.setores.get_by_id(setor_id)
+            if not setor:
+                raise NotFoundError("Setor não encontrado", details={"setor_id": setor_id})
 
-        funcao = uow.funcoes.get_by_id(funcao_id)
-        if not funcao:
-            raise NotFoundError("Função não encontrada", details={"funcao_id": funcao_id})
+        funcao = None
+        if funcao_id is not None:
+            funcao = uow.funcoes.get_by_id(funcao_id)
+            if not funcao:
+                raise NotFoundError("Função não encontrada", details={"funcao_id": funcao_id})
 
         # Criar entidade de domínio (validações automáticas via __post_init__)
         try:

@@ -8,8 +8,8 @@ class UsuarioDTO:
     id: Optional[int]
     nome: str
     pin_hash: str
-    funcao_id: int
-    setor_id: int
+    setor_id: Optional[int] = None
+    funcao_id: Optional[int] = None
 
     def __post_init__(self):
         """Validações básicas da entidade."""
@@ -17,7 +17,9 @@ class UsuarioDTO:
             raise ValueError("Nome é obrigatório")
         if not self.pin_hash or len(self.pin_hash) < 4:
             raise ValueError("PIN deve ter pelo menos 4 caracteres")
-        if self.funcao_id <= 0:
-            raise ValueError("funcao_id deve ser um inteiro positivo")
-        if self.setor_id <= 0:
-            raise ValueError("setor_id deve ser um inteiro positivo")
+        if self.funcao_id != None:
+            if self.funcao_id <= 0:
+                raise ValueError("funcao_id deve ser um inteiro positivo")
+        if self.setor_id != None:
+            if self.setor_id <= 0:
+                raise ValueError("setor_id deve ser um inteiro positivo")
