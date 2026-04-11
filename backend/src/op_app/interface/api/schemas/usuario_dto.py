@@ -8,5 +8,5 @@ class UsuarioDTO:
     id: int
     nome: str
     pin_hash: str
-    funcao_id: int
-    setor_id: int
+    setor_id: Optional[int] = None
+    funcao_id: Optional[int] = None
