@@ -1,6 +1,3 @@
-# 📄 README atualizado (versão profissional de verdade)
-
-
 # 🏭 OP-APP – Sistema de Gerenciamento de Ordens de Produção
 
 Sistema backend para gerenciamento de **Ordens de Produção (OP)** em ambiente industrial (montagem, soldagem e inspeção).
