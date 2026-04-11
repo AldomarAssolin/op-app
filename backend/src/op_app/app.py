@@ -1,5 +1,6 @@
 from flask import Flask
 import logging
+from src.op_app.interface.api.routes.app_routes import bp_app
 from src.op_app.interface.api.routes.health_routes import bp_health
 from src.op_app.interface.api.routes.usuario_routes import bp_usuarios
 from src.op_app.interface.api.routes.setor_routes import bp_setores
@@ -44,6 +45,7 @@ def create_app() -> Flask:
 
     # Blueprints
     logger.info(">>> PASSO 5: Registrando Blueprints...")
+    app.register_blueprint(bp_app)
     app.register_blueprint(bp_health)
     app.register_blueprint(bp_usuarios)
     app.register_blueprint(bp_setores)
