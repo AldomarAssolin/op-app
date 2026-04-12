@@ -8,6 +8,7 @@ Projeto arquitetado com foco em:
 * Regras de negócio isoladas
 * Arquitetura em camadas
 * Evolução para produção real
+* Ambiente totalmente containerizado (Docker)
 
 ---
 
@@ -25,7 +26,7 @@ O sistema permite:
 * Controlar status por item
 * Registrar inspeções
 * Organizar fila por prioridade
-* Gerenciar operadores e setores
+* Gerenciar operadores, funções e setores
 
 ---
 
@@ -44,64 +45,106 @@ O projeto segue abordagem inspirada em:
 | **Interface**      | API HTTP (Flask + Rotas + Handlers) |
 | **Application**    | Casos de uso e orquestração         |
 | **Domain**         | Regras de negócio puras             |
-| **Infrastructure** | Banco de dados, CSV, repositórios   |
+| **Infrastructure** | Banco de dados, repositórios        |
 | **Shared**         | Utilitários transversais            |
-
-Separação pensada para:
-
-* Facilitar testes
-* Evitar acoplamento com Flask
-* Permitir troca de banco no futuro
-* Permitir troca da interface (API → CLI → Web)
 
 ---
 
 # 📂 Estrutura do Projeto
 
-```
+```bash
+
 op-app/
 └── backend/
-    ├── run.py
-    ├── run_dev.sh
-    ├── wsgi.py
-    ├── .env
-    ├── .env.example
-    ├── requirements.txt
-    ├── src/
-    │   ├── interface/
-    │   ├── application/
-    │   ├── domain/
-    │   ├── infrastructure/
-    │   └── shared/
-    ├── migrations/
-    └── tests/
+├── Dockerfile
+├── docker-compose.yml
+├── entrypoint.sh
+├── run.py
+├── run_dev.sh
+├── wsgi.py
+├── requirements.txt
+├── src/
+├── migrations/
+└── tests/
+
 ```
 
 ---
 
-# 🔄 Fluxo Principal do Sistema
+# 🐳 Ambiente com Docker (Recomendado)
 
-1. PCP envia planilha CSV
-2. Sistema importa e valida
-3. OPs e Itens são criados/atualizados
-4. Líder organiza fila
-5. Operador inicia item
-6. Operador finaliza item
-7. Inspetor aprova ou reprova
+## 🚀 Subir aplicação completa
+
+```bash
+docker compose up --build
+````
+
+Isso irá subir:
+
+* API (Flask + Gunicorn)
+* Banco PostgreSQL
 
 ---
 
-# 🚀 Como Rodar o Projeto (Desenvolvimento)
+## 🌐 Acesso
+
+API:
+
+```
+http://localhost:8010
+```
+
+Health check:
+
+```
+GET /health
+```
+
+---
+
+## 🧠 Banco de Dados
+
+* PostgreSQL rodando via container
+* Comunicação interna via hostname:
+
+```
+db:5432
+```
+
+---
+
+## 🔄 Migrations (Alembic)
+
+Executar migrations:
+
+```bash
+docker exec -it op-app-backend alembic upgrade head
+```
+
+Criar nova migration:
+
+```bash
+docker exec -it op-app-backend alembic revision --autogenerate -m "descricao"
+```
+
+---
+
+## ⚠️ Resetar banco (apenas desenvolvimento)
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+---
+
+# 💻 Rodar sem Docker (modo legado/dev)
 
 ## 1️⃣ Criar ambiente virtual
 
-Na pasta `backend/`:
-
 ```bash
 python -m venv .venv
-source .venv/bin/activate      # Linux / WSL
-# ou
-.venv\Scripts\activate         # Windows
+source .venv/bin/activate
 ```
 
 ---
@@ -114,114 +157,41 @@ pip install -r requirements.txt
 
 ---
 
-## 3️⃣ Configurar variáveis de ambiente
+## 3️⃣ Configurar `.env`
 
-Copie:
-
-```
-.env.example → .env
-```
-
-Exemplo de `.env`:
+Exemplo:
 
 ```
-DATABASE_URL=sqlite:///op_app.db
-SECRET_KEY=dev-secret-key
+DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/op_app
 APP_PORT=8010
 ```
 
 ---
 
-## 4️⃣ Aplicar migrations
-
-Se for primeira vez:
-
-```bash
-alembic upgrade head
-```
-
-Se alterou models:
-
-```bash
-alembic revision --autogenerate -m "describe change"
-alembic upgrade head
-```
-
-⚠️ Em ambiente dev, se o banco ficou inconsistente:
-
-```bash
-rm op_app.db
-alembic upgrade head
-```
-
----
-
-## 5️⃣ Rodar aplicação (modo desenvolvimento)
-
-Agora usamos o script:
+## 4️⃣ Rodar aplicação
 
 ```bash
 ./run_dev.sh
 ```
 
-O app será iniciado via Gunicorn com:
-
-* Reload automático
-* Logs habilitados
-* Porta definida via `.env`
-
-Por padrão:
-
-```
-http://127.0.0.1:8010
-```
-
----
-
-# 🏭 Rodando em Produção
-
-Em produção utilize:
-
-```bash
-gunicorn wsgi:app --workers 2 --bind 0.0.0.0:8010
-```
-
-⚠️ Em produção real:
-
-* Use Postgres
-* Configure variáveis via ambiente do servidor
-* Desative reload
-* Configure logs estruturados
-
 ---
 
 # 🧪 Testes
-
-Rodar todos os testes:
 
 ```bash
 pytest
 ```
 
-Estrutura:
-
-```
-tests/
-├── unit/
-└── integration/
-```
-
-* Unit → domínio e regras puras
-* Integration → endpoints e casos de uso
-
 ---
 
 # 🛠 Tecnologias
 
-* Python 3.12+
+* Python 3.11+
 * Flask
 * SQLAlchemy 2.0
 * Alembic
+* PostgreSQL
+* Docker / Docker Compose
 * Pytest
 * Gunicorn
 
@@ -230,10 +200,11 @@ tests/
 # 📌 Decisões Arquiteturais
 
 * Uso de **Unit of Work** para controle transacional
-* Domínio isolado de infraestrutura
-* Erros padronizados (`ValidationError`, `NotFoundError`, etc.)
-* Operador referencia `setor_id` (FK real)
-* Banco desacoplado da regra de negócio
+* Separação clara entre domínio e infraestrutura
+* Uso de migrations com Alembic
+* Banco PostgreSQL como padrão
+* Campos `setor_id` e `funcao_id` agora opcionais no usuário
+* Erros padronizados (`ValidationError`, `NotFoundError`)
 
 ---
 
@@ -244,9 +215,7 @@ tests/
 * Dashboard de produção
 * Métricas de eficiência
 * API para frontend
-* Migração para Postgres
-* Logs estruturados
-* Observabilidade
+* Observabilidade (logs + métricas)
 
 ---
 
@@ -259,5 +228,5 @@ Projeto inspirado em ambiente de metalúrgica:
 * Inspeção
 * Liberação
 
-Foco em simplicidade inicial com arquitetura escalável.
+>Foco em simplicidade inicial com arquitetura escalável.
 
